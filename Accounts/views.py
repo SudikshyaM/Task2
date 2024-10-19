@@ -2,14 +2,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated,IsAuthenticatedOrReadOnly
-from django.urls import reverse
 from django.core.mail import send_mail
 from django.conf import settings
 from .models import User
 from rest_framework_simplejwt.exceptions import TokenError
 from .serializers import *
 from rest_framework_simplejwt.tokens import RefreshToken,AccessToken
-from rest_framework import serializers
 from rest_framework.renderers import (HTMLFormRenderer, JSONRenderer,BrowsableAPIRenderer,)
 from rest_framework.pagination import PageNumberPagination
 
@@ -44,7 +42,6 @@ class RegistrationView(APIView):
         if serializer.is_valid():
             user = serializer.save()
             tokens = user.tokens()  
-            self.send_verification_email(user, tokens['access'])
 
             return Response({
                 "message": "User registered successfully! Please verify your email.",
@@ -53,24 +50,6 @@ class RegistrationView(APIView):
             }, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def send_verification_email(self, user, token):
-        
-        verification_url = reverse('verify-email', kwargs={'token': str(token)})
-        full_verification_link = f'http://localhost:8000/{verification_url}' 
-
-        try:
-           
-            send_mail(
-                subject='Verify your email',
-                message=f'Click the link to verify your account: {full_verification_link}',
-                from_email=settings.EMAIL_HOST_USER,
-                recipient_list=[user.email],
-                fail_silently=False,
-            )
-        except:
-            raise serializers.ValidationError("Error sending verification email. Please try again.")
-
 
 class VerifyEmailView(APIView):
     def get(self, request, token):

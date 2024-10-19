@@ -54,11 +54,6 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
-    
-    def save(self, *args, **kwargs):
-        if self._state.adding:
-            self.referral_code = uuid.uuid4()
-        super(User, self).save(*args, **kwargs)
 
     def generate_referral_link(self):
         base_url = "http://localhost:8000/api/register"  
