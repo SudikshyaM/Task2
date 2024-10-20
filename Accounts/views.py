@@ -8,8 +8,11 @@ from .models import User
 from rest_framework_simplejwt.exceptions import TokenError
 from .serializers import *
 from rest_framework_simplejwt.tokens import RefreshToken,AccessToken
-from rest_framework.renderers import (HTMLFormRenderer, JSONRenderer,BrowsableAPIRenderer,)
+# from rest_framework.renderers import (HTMLFormRenderer, JSONRenderer,BrowsableAPIRenderer,)
 from rest_framework.pagination import PageNumberPagination
+import logging
+
+logger = logging.getLogger(__name__)
 
 class CustomPagination(PageNumberPagination):
     page_size = 2
@@ -35,7 +38,7 @@ class ReferredUsersView(APIView):
 
 class RegistrationView(APIView):
     serializer_class = RegistrationSerializer
-    renderer_classes = (BrowsableAPIRenderer, JSONRenderer, HTMLFormRenderer)
+    # renderer_classes = (BrowsableAPIRenderer, JSONRenderer, HTMLFormRenderer)
 
     def post(self, request):
         serializer = RegistrationSerializer(data=request.data, context={'request': request})
@@ -67,7 +70,6 @@ class VerifyEmailView(APIView):
         
 class LoginView(APIView):
     serializer_class = LoginSerializer
-    renderer_classes = (BrowsableAPIRenderer, JSONRenderer, HTMLFormRenderer)
     def post(self,request,*args,**kwargs):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
@@ -89,6 +91,7 @@ class LoginView(APIView):
                 else:
                     return Response({'error': 'You are not verified. Please verify your email'}, status=status.HTTP_403_FORBIDDEN)
             else:
+                logger.error("Error occurred : invalid credentials")
                 return Response({'error': 'Invalid password credentials'}, status=status.HTTP_401_UNAUTHORIZED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -105,7 +108,7 @@ class LogoutView(APIView):
 
 class ForgotPasswordView(APIView):
     serializer_class = ForgotPasswordSerializer
-    renderer_classes = (BrowsableAPIRenderer, JSONRenderer, HTMLFormRenderer)
+    # renderer_classes = (BrowsableAPIRenderer, JSONRenderer, HTMLFormRenderer)
 
     def post(self, request):
         serializer = ForgotPasswordSerializer(data=request.data)
@@ -132,7 +135,7 @@ class ForgotPasswordView(APIView):
     
 class PasswordResetView(APIView):
     serializer_class = ResetPasswordSerializer
-    renderer_classes = (BrowsableAPIRenderer, JSONRenderer, HTMLFormRenderer)
+    # renderer_classes = (BrowsableAPIRenderer, JSONRenderer, HTMLFormRenderer)
 
     def post(self,request,token):
         try:

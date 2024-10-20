@@ -99,6 +99,7 @@ MIDDLEWARE = [
 ]
 
 DRF_API_LOGGER_DATABASE = True
+DRF_API_LOGGER_CONSOLE = True
 
 ROOT_URLCONF = 'Task2.urls'
 
@@ -200,3 +201,32 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level':'ERROR',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'drf_api_logger': {
+            'handlers': ['console'],
+            'level': 'ERROR', 
+            'propagate': True,
+        },
+        'django': {
+            'handlers': ['console'],
+            'level': 'ERROR', 
+            'propagate': True,
+        },
+    },
+}
